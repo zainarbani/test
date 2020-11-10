@@ -1,0 +1,91 @@
+<html>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <head>
+        <title>IDXXI Scraper</title>
+        <style type="text/css">
+            body {
+                background: #3b3a39;
+            }
+            form {
+                text-align: left;
+            }
+            .results {
+                display: flex;
+                color: white;
+                margin-top: 10px;
+            }
+            .results img {
+                margin-right: 10px;
+                display: block;
+            }
+            .results h3 {
+                font-size: 15px;
+                margin: 0;
+            }
+            .results p {
+                font-size: 12px;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <form id="search">
+            <label for="query"><b></b></label>
+            <input type="text" id="query" value="Title, IMDB or Artist name" />
+            <button id="submit" type="submit">Search</button>
+        </form>
+        <script>
+            document.getElementById("search").onsubmit = function (e) {
+                e.preventDefault();
+                var query = document.getElementById("query").value;
+                $.ajax({
+                    url: "https://m.kotakputih.casa/api/movies.php",
+                    type: "GET",
+                    dataType: "JSON",
+                    data: {
+                        search: query,
+                        key: genHex(10),
+                    },
+                    success: function (e) {
+                        if (e.length > 0) {
+                            var item;
+                            for (item in e) {
+                                if (e[item].type == 1) {
+                                    var type = "Movie";
+                                    var duration = "Duration: " + e[item].duration + " min";
+                                } else {
+                                    var type = "TV series";
+                                    var duration = "Episodes: " + e[item].Episodes + " episodes";
+                                }
+                                var code = [
+                                    '<div class="results">',
+                                    '<img src="' + e[item].poster + '" width="150" height="150"/>',
+                                    '<div class="text">',
+                                    "<h3><strong>" + e[item].title + "</strong></h3>",
+                                    "<p>Year: " + e[item].year + "</p>",
+                                    "<p>Type: " + type + "</p>",
+                                    "<p>" + duration + "</p>",
+                                    "<p>Rating: " + e[item].imdb_rating + "</p>",
+                                    "</div>",
+                                    "</div>",
+                                ].join("\n");
+                                document.querySelector("body").innerHTML += code;
+                            }
+                        } else {
+                            var code = ['<div class="results">', "<h3><strong>No result found</strong></h3>", "</div>"].join("\n");
+                            document.querySelector("body").innerHTML += code;
+                        }
+                    },
+                });
+            };
+            function genHex(x) {
+                let output = "";
+                for (let i = 0; i < x; ++i) {
+                    output += Math.floor(Math.random() * 16).toString(16);
+                }
+                return output;
+            }
+        </script>
+    </body>
+</html>
